@@ -35,3 +35,9 @@
     * [POST 调用示例](furries/AEAB_API.md#post-json-调用示例)
     * [JS 调用示例](furries/AEAB_API.md#javascript-调用示例)
     * [返回示例](furries/AEAB_API.md#返回示例)
+
+## 许可协议
+
+* [XJ380 操作系统用户许可协议](licenses/XJ380_EULA.md)
+* [XINGJI 工作室交流群用户许可协议](licenses/XJ380OS_Group_Chat_Licenses.md)
+* [极端反福瑞行为档案库许可协议](licenses/AEAB_EULA.md)
