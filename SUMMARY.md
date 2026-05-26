@@ -29,6 +29,7 @@
 
 ## 福瑞同萌
 
+* [加入福瑞同萌教程](furries/FURRIES_Join.md)
 * [极端福瑞/反福瑞行为档案库 API 文档](furries/AEAB_API.md)
     * [请求参数](furries/AEAB_API.md#请求参数)
     * [GET 调用示例](furries/AEAB_API.md#get-调用示例)
