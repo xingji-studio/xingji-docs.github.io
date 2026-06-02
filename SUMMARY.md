@@ -27,18 +27,7 @@
     * [CHAPTER 5 - BridgeEngine API](xingji/xj380/XJ380_API_Spec_1_3.md#5-1-简介)
     * [CHAPTER 6 - Stardust UI](xingji/xj380/XJ380_API_Spec_1_3.md#6-1-简介)
 
-## 福瑞同萌
-
-* [加入福瑞同萌教程](furries/FURRIES_Join.md)
-* [极端福瑞/反福瑞行为档案库 API 文档](furries/AEAB_API.md)
-    * [请求参数](furries/AEAB_API.md#请求参数)
-    * [GET 调用示例](furries/AEAB_API.md#get-调用示例)
-    * [POST 调用示例](furries/AEAB_API.md#post-json-调用示例)
-    * [JS 调用示例](furries/AEAB_API.md#javascript-调用示例)
-    * [返回示例](furries/AEAB_API.md#返回示例)
-
 ## 许可协议
 
 * [XJ380 操作系统用户许可协议](licenses/XJ380_EULA.md)
 * [XINGJI 工作室交流群用户许可协议](licenses/XJ380OS_Group_Chat_Licenses.md)
-* [极端福瑞/反福瑞行为档案库许可协议](licenses/AEAB_EULA.md)
