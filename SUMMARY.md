@@ -31,4 +31,4 @@
 
 * [XJ380 操作系统用户许可协议](licenses/XJ380_EULA.md)
 * [XINGJI 工作室交流群用户许可协议](licenses/XJ380OS_Group_Chat_Licenses.md)
-* [WormHole 用户许可协议](licenses/Wormhole_Licenses.md)
+* [WormHole 用户许可协议](licenses/Wormhole_EULA.md)
