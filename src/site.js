@@ -26,8 +26,15 @@ document.addEventListener('keydown', (event) => {
     search.focus();
   }
 });
+function collapseDescendants(group) {
+  for (const child of group.querySelectorAll('details[open]')) child.open = false;
+}
+
 navigation.addEventListener('click', (event) => {
-  if (event.target.closest('a') && window.innerWidth <= 760) setMenu(false);
+  const link = event.target.closest('a');
+  const summary = event.target.closest('summary');
+  if (summary && !link && !summary.parentElement.open) collapseDescendants(summary.parentElement);
+  if (link && window.innerWidth <= 760) setMenu(false);
 });
 
 function currentNavigation() {
@@ -48,10 +55,17 @@ function currentNavigation() {
   if (current) {
     current.setAttribute('aria-current', current.hash ? 'location' : 'page');
     if (current.classList.contains('home-link')) current.classList.add('is-current');
+    const ancestors = [];
     let ancestor = current.parentElement;
     while (ancestor && ancestor !== navigation) {
-      if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      if (ancestor.tagName === 'DETAILS') ancestors.push(ancestor);
       ancestor = ancestor.parentElement;
+    }
+    for (const group of ancestors.reverse()) {
+      if (!group.open) {
+        collapseDescendants(group);
+        group.open = true;
+      }
     }
   }
 }

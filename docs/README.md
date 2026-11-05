@@ -5,7 +5,7 @@
 ## 开发文档
 
 * [StardustUI 文档](develop/stardust-ui/docs.md)
-* [XJ380API 标准文档](develop/xj380/XJ380_API_Spec_1_3.md)
+* [XJ380API 标准文档](develop/xj380/XJ380_API_Spec_CPP_1_4.md)
 
 ## 许可协议
 

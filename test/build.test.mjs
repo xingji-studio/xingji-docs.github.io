@@ -73,6 +73,8 @@ test('keeps deeply nested sidebar items independently collapsible', async (t) =>
   const nav = html.match(/<nav class="navigation"[\s\S]*?<\/nav>/)[0];
   // Two headings and the first eight list levels all have their own children.
   assert.equal((nav.match(/<details\b/g) || []).length, 10);
+  // Links to different anchors in the current document must not open every branch.
+  assert.equal((nav.match(/<details open>/g) || []).length, 1);
   assert.match(nav, /href="\/deep#level-9"/);
   assert.equal((nav.match(/data-nav-item/g) || []).length, 11);
 });

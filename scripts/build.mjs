@@ -101,7 +101,6 @@ function renderDocument(markdown, sourcePath) {
 function sidebarTree(markdown) {
   const ast = markdownParser.parse(markdown);
   const definitions = ast.children.filter((node) => node.type === 'definition');
-  const definitionMap = new Map(definitions.map((node) => [node.identifier.toLowerCase(), node.url]));
   const root = { children: [] };
   const stack = [{ depth: 0, node: root }];
 
@@ -125,27 +124,10 @@ function sidebarTree(markdown) {
       stack.at(-1).node.children.push({ label: node, children: [], kind: 'item' });
     }
   }
-  return { children: root.children, definitions, definitionMap };
+  return { children: root.children, definitions };
 }
 
 function sidebarHtml(sidebar, currentRoute) {
-  function labelLinks(label) {
-    const links = [];
-    visit(label, (node) => {
-      if (node.type === 'link') links.push(node.url);
-      if (node.type === 'linkReference') {
-        const target = sidebar.definitionMap.get(node.identifier.toLowerCase());
-        if (target) links.push(target);
-      }
-    });
-    return links.map((link) => resolveHref(link, '_sidebar.md'));
-  }
-
-  function containsCurrent(entry) {
-    return labelLinks(entry.label).some((href) => href.split(/[?#]/)[0] === currentRoute)
-      || entry.children.some(containsCurrent);
-  }
-
   function renderLabel(label) {
     const tree = htmlProcessor.runSync({ type: 'root', children: [label, ...sidebar.definitions] });
     transformLinks(tree, '_sidebar.md');
@@ -166,7 +148,7 @@ function sidebarHtml(sidebar, currentRoute) {
       if (!entry.children.length) {
         return `<li class="nav-item${groupClass}" data-nav-item data-search="${search}"><div class="nav-line">${label}</div></li>`;
       }
-      const open = (depth === 0 && entry.kind === 'heading') || containsCurrent(entry);
+      const open = depth === 0 && entry.kind === 'heading';
       return `<li class="nav-item${groupClass}" data-nav-item data-search="${search}"><details${open ? ' open' : ''}><summary><span class="nav-label">${label}</span><svg class="nav-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m5 6 3 3 3-3"/></svg></summary>${renderEntries(entry.children, depth + 1)}</details></li>`;
     }).join('')}</ul>`;
   }
