@@ -117,6 +117,43 @@ details[open] > summary > .nav-chevron { transform: rotate(0); }
 .markdown-body input[type="checkbox"] { margin-right: .5em; }
 .markdown-body .contains-task-list { list-style: none; padding-left: .25em; }
 .markdown-body .footnotes { margin-top: 50px; font-size: 13px; }
+.markdown-body .heading-anchor { margin-left: .55em; color: #8aabbc; font-size: .8em; font-weight: 500; text-decoration: none; opacity: 0; }
+.markdown-body :is(h2, h3, h4, h5, h6):hover > .heading-anchor, .markdown-body .heading-anchor:focus-visible { opacity: 1; }
+.code-block { min-width: 0; margin: 20px 0 25px; border: 1px solid #e6edf1; border-radius: 8px; overflow: hidden; background: #f7f9fb; }
+.code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; padding: 6px 14px; border-bottom: 1px solid #e6edf1; color: #647887; font-size: 11px; line-height: 1.5; }
+.copy-code { border: 0; border-radius: 4px; padding: 3px 8px; background: transparent; color: #496c81; font-size: 11px; cursor: pointer; }
+.copy-code:hover { color: var(--blue-dark); background: #e7f2f8; }
+.markdown-body .code-block pre { margin: 0; border: 0; border-radius: 0; }
+.hljs-comment, .hljs-quote { color: #66757e; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-type { color: #a626a4; }
+.hljs-string, .hljs-regexp, .hljs-addition { color: #397300; }
+.hljs-number, .hljs-symbol, .hljs-bullet, .hljs-variable, .hljs-template-variable, .hljs-attr { color: #986000; }
+.hljs-title, .hljs-section, .hljs-selector-id, .hljs-selector-class { color: #006caf; }
+.hljs-built_in, .hljs-name, .hljs-tag, .hljs-deletion { color: #ba3d42; }
+.hljs-meta, .hljs-link { color: #087d7d; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+.markdown-body .markdown-alert { --alert-color: #087fb9; --alert-background: #f0f8fc; margin: 22px 0; padding: 14px 18px; border-left: 4px solid var(--alert-color); border-radius: 0 6px 6px 0; background: var(--alert-background); }
+.markdown-body .markdown-alert-tip { --alert-color: #247443; --alert-background: #f1f9f3; }
+.markdown-body .markdown-alert-important { --alert-color: #7952b3; --alert-background: #f7f4fc; }
+.markdown-body .markdown-alert-warning { --alert-color: #936400; --alert-background: #fffaeb; }
+.markdown-body .markdown-alert-caution { --alert-color: #bd3939; --alert-background: #fff4f4; }
+.markdown-body .markdown-alert-title { margin-bottom: 7px; color: var(--alert-color); font-weight: 700; }
+.markdown-body .markdown-alert > :last-child { margin-bottom: 0; }
+.markdown-body details { margin: 20px 0; padding: 12px 16px; border: 1px solid #e5ebef; border-radius: 6px; }
+.markdown-body summary { color: #344b59; font-weight: 650; cursor: pointer; }
+.markdown-body details[open] > summary { margin-bottom: 14px; }
+.markdown-body .diagram { min-width: 0; margin: 22px 0 27px; border: 1px solid #e5ebef; border-radius: 8px; overflow: hidden; }
+.diagram-drawing { padding: 20px; overflow-x: auto; text-align: center; }
+.diagram-drawing > svg { display: block; max-width: none !important; height: auto; margin: 0 auto; }
+.markdown-body .diagram-source { margin: 0; border: 0; border-top: 1px solid #e5ebef; border-radius: 0; font-size: 12px; }
+.markdown-body .diagram-source pre { margin-bottom: 0; text-align: left; }
+.markdown-body .diagram-error { margin: 20px 0 8px; color: #a33d32; font-size: 13px; }
+.markdown-body .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+.markdown-body .katex { font-size: 1.1em; }
+.markdown-body dt { margin-top: 16px; font-weight: 700; }
+.markdown-body dd { margin: 6px 0 16px 1.6em; }
+.markdown-body kbd { padding: 2px 5px; border: 1px solid #d8e1e7; border-bottom-width: 2px; border-radius: 4px; background: #f7f9fb; font: .85em "SFMono-Regular", Consolas, monospace; }
 .article-footer { margin-top: 82px; color: #a7b3bc; font-size: 9px; font-weight: 700; letter-spacing: .1em; }
 .footer-line { height: 1px; background: #e8edf0; margin-bottom: 20px; }
 .article-footer > div:last-child { display: flex; justify-content: space-between; gap: 20px; }

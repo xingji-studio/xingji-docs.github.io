@@ -4,21 +4,90 @@ import { fileURLToPath } from 'node:url';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkMath from 'remark-math';
 import remarkRehype from 'remark-rehype';
+import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
 import { visit } from 'unist-util-visit';
 import { toString as hastToString } from 'hast-util-to-string';
 import { toString as mdastToString } from 'mdast-util-to-string';
+import { all, createLowlight } from 'lowlight';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const markdownParser = unified().use(remarkParse).use(remarkGfm);
+const lowlight = createLowlight(all);
+lowlight.registerAlias({ cpp: ['c++'], csharp: ['c#'] });
+const markdownParser = unified().use(remarkParse).use(remarkGfm).use(remarkFrontmatter).use(remarkMath);
 const htmlProcessor = unified()
-  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(remarkAlerts)
+  .use(remarkRehype, { allowDangerousHtml: true, footnoteLabel: '脚注', footnoteBackLabel: '返回正文' })
   .use(rehypeRaw)
-  .use(rehypeSlug);
+  .use(rehypeSlug)
+  .use(() => (tree) => {
+    // Read headings before KaTeX adds parallel HTML and MathML representations.
+    visit(tree, 'element', (node) => {
+      if (/^h[1-6]$/.test(node.tagName)) node.data = { ...node.data, headingText: hastToString(node) };
+    });
+  })
+  .use(rehypeKatex, { trust: false, strict: 'ignore' })
+  .use(rehypeCodeBlocks);
 const htmlStringifier = unified().use(rehypeStringify);
+
+function element(tagName, properties, children) {
+  return { type: 'element', tagName, properties, children };
+}
+
+function text(value) {
+  return { type: 'text', value };
+}
+
+function remarkAlerts() {
+  const titles = { NOTE: '说明', TIP: '提示', IMPORTANT: '重要', WARNING: '警告', CAUTION: '注意' };
+  return (tree) => {
+    visit(tree, 'blockquote', (node) => {
+      const paragraph = node.children[0];
+      const first = paragraph?.type === 'paragraph' && paragraph.children[0];
+      const marker = first?.type === 'text' && first.value.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\r?\n|$)/);
+      if (!marker) return;
+      first.value = first.value.slice(marker[0].length);
+      if (!first.value) paragraph.children.shift();
+      if (!paragraph.children.length) node.children.shift();
+      const kind = marker[1].toLowerCase();
+      node.data = { ...node.data, hName: 'div', hProperties: { className: ['markdown-alert', `markdown-alert-${kind}`] } };
+      node.children.unshift({
+        type: 'paragraph', data: { hProperties: { className: ['markdown-alert-title'] } },
+        children: [text(titles[marker[1]])],
+      });
+    });
+  };
+}
+
+function rehypeCodeBlocks() {
+  return (tree) => {
+    visit(tree, 'element', (node) => {
+      if (node.tagName !== 'pre' || node.children.length !== 1) return;
+      const code = node.children[0];
+      if (code.type !== 'element' || code.tagName !== 'code') return;
+      const classes = code.properties.className || [];
+      const language = (classes.find((name) => name.startsWith('language-')) || '').slice(9).toLowerCase();
+      if (language === 'mermaid') {
+        node.properties.dataMermaid = '';
+        node.properties.className = ['mermaid-source'];
+        return;
+      }
+      const plain = ['', 'text', 'txt', 'plain', 'plaintext', 'no-highlight', 'nohighlight'].includes(language);
+      if (!plain && lowlight.registered(language) && !classes.includes('no-highlight') && !classes.includes('nohighlight')) {
+        code.children = lowlight.highlight(language, hastToString(code)).children;
+        code.properties.className = [...classes, 'hljs'];
+      }
+      node.properties.dataCodeBlock = '';
+      node.properties.dataLanguage = language || 'text';
+      node.properties.tabIndex = 0;
+    });
+  };
+}
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
@@ -87,7 +156,7 @@ function renderDocument(markdown, sourcePath) {
   const headings = [];
   visit(tree, 'element', (node) => {
     if (!/^h[1-6]$/.test(node.tagName)) return;
-    const text = hastToString(node).trim();
+    const text = (node.data?.headingText ?? hastToString(node)).trim();
     const depth = Number(node.tagName[1]);
     if (!title && depth === 1) title = text;
     const classes = node.properties?.className || [];
@@ -95,7 +164,18 @@ function renderDocument(markdown, sourcePath) {
       headings.push({ depth, text, id: String(node.properties.id) });
     }
   });
-  return { title: title || path.posix.basename(sourcePath, path.posix.extname(sourcePath)), headings, html: htmlStringifier.stringify(tree) };
+  let hasMermaid = false;
+  let hasMath = false;
+  visit(tree, 'element', (node) => {
+    if ('dataMermaid' in node.properties) hasMermaid = true;
+    if (node.properties.className?.includes('katex')) hasMath = true;
+    if (/^h[2-6]$/.test(node.tagName) && node.properties.id && !node.properties.className?.includes('sr-only')) {
+      node.children.push(element('a', {
+        className: ['heading-anchor'], href: `#${encodeURIComponent(node.properties.id)}`, ariaLabel: '链接到此标题',
+      }, [text('#')]));
+    }
+  });
+  return { title: title || path.posix.basename(sourcePath, path.posix.extname(sourcePath)), headings, hasMermaid, hasMath, html: htmlStringifier.stringify(tree) };
 }
 
 function sidebarTree(markdown) {
@@ -157,7 +237,7 @@ function sidebarHtml(sidebar, currentRoute) {
 
 const githubIcon = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.31-3.75-1.31-.5-1.29-1.23-1.63-1.23-1.63-1.01-.69.07-.68.07-.68 1.12.08 1.7 1.15 1.7 1.15 1 1.7 2.62 1.21 3.25.93.1-.72.39-1.21.7-1.49-2.47-.28-5.08-1.24-5.08-5.5 0-1.21.44-2.2 1.15-2.98-.11-.28-.5-1.41.11-2.94 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.56 0c2.12-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.66.11 2.94.72.78 1.14 1.77 1.14 2.98 0 4.27-2.61 5.21-5.1 5.49.4.35.75 1.02.75 2.06V22c0 .29.2.64.77.53A11.1 11.1 0 0 0 12 .9Z"/></svg>`;
 
-function pageTemplate({ title, html, headings, sidebar, currentRoute, sourcePath }) {
+function pageTemplate({ title, html, headings, sidebar, currentRoute, sourcePath, hasMermaid = false, hasMath = false }) {
   const isHome = currentRoute === '/' || currentRoute === '/README';
   const crumbs = sourcePath ? sourcePath.replace(/\.md$/i, '').split('/').slice(0, -1) : [];
   const breadcrumb = `<a href="/">文档</a>${crumbs.map((part) => `<span aria-hidden="true">/</span><span>${escapeHtml(part)}</span>`).join('')}<span aria-hidden="true">/</span><span class="breadcrumb-current">${escapeHtml(isHome ? '首页' : title)}</span>`;
@@ -172,7 +252,9 @@ function pageTemplate({ title, html, headings, sidebar, currentRoute, sourcePath
 <title>${escapeHtml(title)} | XINGJI 文档</title>
 <link rel="icon" href="/_site/logo/XINGJI_rect.png" type="image/png">
 <link rel="stylesheet" href="/_site/site.css">
+${hasMath ? '<link rel="stylesheet" href="/_site/vendor/katex/katex.min.css">' : ''}
 <script src="/_site/site.js" defer></script>
+${hasMermaid ? '<script type="module" src="/_site/diagrams.js"></script>' : ''}
 </head>
 <body id="top">
 <a class="skip-link" href="#content">跳至正文</a>
@@ -217,6 +299,22 @@ function outputForMarkdown(relativePath) {
   return path.posix.basename(stem).toLowerCase() === 'index' ? `${stem}/index.html` : `${stem}.html`;
 }
 
+async function vendorAssets() {
+  const mermaidDist = path.dirname(fileURLToPath(import.meta.resolve('mermaid')));
+  const katexDist = path.dirname(fileURLToPath(import.meta.resolve('katex')));
+  const mermaidFiles = ['mermaid.esm.min.mjs', ...(await walk(path.join(mermaidDist, 'chunks/mermaid.esm.min')))
+    .filter((name) => name.endsWith('.mjs')).map((name) => `chunks/mermaid.esm.min/${name}`)];
+  const katexFiles = ['katex.min.css', ...(await walk(path.join(katexDist, 'fonts')))
+    .filter((name) => /\.(?:woff2?|ttf)$/.test(name)).map((name) => `fonts/${name}`)];
+  return [
+    ...mermaidFiles.map((name) => ({ source: path.join(mermaidDist, name), output: `_site/vendor/mermaid/${name}` })),
+    ...katexFiles.map((name) => ({ source: path.join(katexDist, name), output: `_site/vendor/katex/${name}` })),
+    ...[['mermaid', mermaidDist], ['katex', katexDist]].map(([name, directory]) => ({
+      source: path.join(directory, '../LICENSE'), output: `_site/vendor/${name}/LICENSE`,
+    })),
+  ];
+}
+
 export async function build({ sourceDir = path.join(projectRoot, 'docs'), outDir = path.join(projectRoot, 'dist'), assetDir = path.join(projectRoot, 'src') } = {}) {
   const files = await walk(sourceDir);
   const markdownFiles = files.filter((name) => /\.md$/i.test(name));
@@ -224,8 +322,9 @@ export async function build({ sourceDir = path.join(projectRoot, 'docs'), outDir
     throw new Error('docs/README.md 和 docs/_sidebar.md 是构建所必需的。');
   }
   const assetFiles = files.filter((name) => !/\.md$/i.test(name) && name !== 'index.html');
-  const siteAssets = ['site.css', 'site.js', 'logo/XINGJI.png', 'logo/XINGJI_rect.png'];
-  const outputs = new Set(['index.html', ...siteAssets.map((asset) => `_site/${asset}`)]);
+  const siteAssets = ['site.css', 'site.js', 'diagrams.js', 'logo/XINGJI.png', 'logo/XINGJI_rect.png'];
+  const vendors = await vendorAssets();
+  const outputs = new Set(['index.html', ...siteAssets.map((asset) => `_site/${asset}`), ...vendors.map((asset) => asset.output)]);
   for (const filename of [...markdownFiles.map(outputForMarkdown), ...assetFiles]) {
     if (outputs.has(filename)) throw new Error(`输出路径冲突：${filename}`);
     outputs.add(filename);
@@ -237,6 +336,11 @@ export async function build({ sourceDir = path.join(projectRoot, 'docs'), outDir
     const destination = path.join(outDir, '_site', asset);
     await fs.mkdir(path.dirname(destination), { recursive: true });
     await fs.copyFile(path.join(assetDir, asset), destination);
+  }
+  for (const asset of vendors) {
+    const destination = path.join(outDir, asset.output);
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    await fs.copyFile(asset.source, destination);
   }
   for (const filename of assetFiles) {
     const destination = path.join(outDir, filename);

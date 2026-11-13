@@ -1,6 +1,7 @@
 # XINGJI 工作室线上文档站
 
 * [简介](README.md)
+* [Markdown 编写指南与渲染示例](markdown-guide.md)
 
 ## 开发文档
 

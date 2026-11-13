@@ -100,3 +100,40 @@ function filterNavigation() {
   noResults.hidden = !query || homeMatches || matches.some(Boolean);
 }
 search.addEventListener('input', filterNavigation);
+
+for (const pre of document.querySelectorAll('.markdown-body pre[data-code-block]')) {
+  const block = document.createElement('div');
+  block.className = 'code-block';
+  const toolbar = document.createElement('div');
+  toolbar.className = 'code-toolbar';
+  const language = document.createElement('span');
+  language.textContent = pre.dataset.language;
+  toolbar.append(language);
+  // Clipboard access requires a secure context; the code remains selectable everywhere.
+  if (navigator.clipboard?.writeText) {
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'copy-code';
+    copy.textContent = '复制代码';
+    copy.setAttribute('aria-label', '复制代码');
+    const status = document.createElement('span');
+    status.className = 'sr-only';
+    status.setAttribute('role', 'status');
+    let reset;
+    copy.addEventListener('click', async () => {
+      clearTimeout(reset);
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code').textContent);
+        copy.textContent = '已复制';
+        status.textContent = '代码已复制到剪贴板';
+      } catch {
+        copy.textContent = '复制失败';
+        status.textContent = '复制失败，请手动选择代码复制';
+      }
+      reset = setTimeout(() => { copy.textContent = '复制代码'; status.textContent = ''; }, 2000);
+    });
+    toolbar.append(copy, status);
+  }
+  pre.replaceWith(block);
+  block.append(toolbar, pre);
+}
