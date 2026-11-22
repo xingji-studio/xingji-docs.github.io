@@ -3,6 +3,10 @@
 * [简介](README.md)
 * [Markdown 编写指南与渲染示例](markdown-guide.md)
 
+## 使用手册
+
+* [XJ380 操作系统](manual/xj380/XJ380.md)
+
 ## 开发文档
 
 * [StardustUI 文档](develop/stardust-ui/docs.md)

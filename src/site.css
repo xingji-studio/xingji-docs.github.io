@@ -44,7 +44,6 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .sidebar-eyebrow { display: flex; justify-content: space-between; color: #92a0ab; font-size: 9px; font-weight: 750; letter-spacing: .12em; white-space: nowrap; }
 .sidebar-eyebrow span { color: #c0c9d0; font-size: 8px; letter-spacing: .04em; }
 .sidebar-title { margin-top: 17px; color: #1b2b38; font-size: 22px; font-weight: 760; letter-spacing: -.04em; }
-.sidebar-title-dot { color: var(--blue); }
 .sidebar-description { margin: 7px 0 23px; color: #99a4ad; font-size: 11px; line-height: 1.7; }
 .nav-search { display: flex; align-items: center; gap: 8px; height: 39px; border: 1px solid #e8edf1; border-radius: 7px; padding: 0 10px; background: #fff; }
 .nav-search:focus-within { border-color: #8ac8e8; box-shadow: 0 0 0 3px #e8f6fd; }

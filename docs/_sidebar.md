@@ -1,3 +1,9 @@
+## 使用手册
+
+* [XJ380 操作系统](manual/xj380/XJ380.md)
+    * [XJ380 使用指南](manual/xj380/guide/XJ380_guide.md)
+    * [XJ380 错误排查指南](manual/xj380/error/XJ380_error.md)
+
 ## 开发文档
 
 * [StardustUI 文档](develop/stardust-ui/docs.md)
@@ -447,6 +453,7 @@
 
 * [XJ380 操作系统用户许可协议](licenses/XJ380_EULA.md)
 * [XINGJI 工作室交流群用户许可协议](licenses/XJ380OS_Group_Chat_Licenses.md)
+* [Dogmilk 野生狗奶许可证](licenses/Dogmilk_License/aboutDogmilkLicense.md)
 
 ## 声明
 

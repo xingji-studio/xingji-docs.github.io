@@ -67,7 +67,7 @@ static const uint8_t EPF_MAGIC[4] = {
 
 **磁盘中只有这 4 个字节，没有字符串结尾的 `\0`。** 与之相比，ELF 的魔数也占开头 4 字节，但其整个 `e_ident` 标识区占 16 字节；两者需要区分。[gabi.xinuos.com](https://gabi.xinuos.com/elf/02-eheader.html?utm_source=chatgpt.com)
 
-EPF 可以暂定英文全称为 **Executable Program Format**。
+EPF 英文全称为 **Executable Program Format**。
 
 建议覆盖三类文件：
 

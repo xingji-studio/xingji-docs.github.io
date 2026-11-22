@@ -268,7 +268,7 @@ ${hasMermaid ? '<script type="module" src="/_site/diagrams.js"></script>' : ''}
   <aside class="sidebar" id="sidebar" aria-label="文档导航">
     <div class="sidebar-content">
       <div class="sidebar-eyebrow">DOCUMENTATION <span>01 / INDEX</span></div>
-      <div class="sidebar-title">浏览文档<span class="sidebar-title-dot">.</span></div>
+      <div class="sidebar-title">浏览文档</div>
       <p class="sidebar-description">探索 XINGJI 的开发指南与资料。</p>
       <label class="nav-search"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.7" cy="8.7" r="5.4"/><path d="m12.8 12.8 3.5 3.5"/></svg><span class="sr-only">筛选目录</span><input type="search" placeholder="筛选目录" autocomplete="off"><kbd>/</kbd></label>
       <nav class="navigation" aria-label="文档目录"><a class="home-link${isHome ? ' is-current' : ''}" href="/"${isHome ? ' aria-current="page"' : ''}><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m2.5 8 6.5-5.5L15.5 8v6.5h-5V10H7.5v4.5h-5V8Z"/></svg>文档首页<span>↗</span></a>${sidebarHtml(sidebar, isHome ? '/README' : currentRoute)}<p class="no-results" hidden>没有找到匹配的目录。</p></nav>
