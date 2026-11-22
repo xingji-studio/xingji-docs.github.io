@@ -17,6 +17,7 @@
 
 * [XJ380 操作系统用户许可协议](licenses/XJ380_EULA.md)
 * [XINGJI 工作室交流群用户许可协议](licenses/XJ380OS_Group_Chat_Licenses.md)
+* [Dogmilk 野生狗奶许可证](licenses/Dogmilk_License/aboutDogmilkLicense.md)
 
 ## 声明
 
